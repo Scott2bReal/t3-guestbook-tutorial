@@ -21,7 +21,7 @@ export const guestbookRouter = t.router({
     .input(
       z.object({
         name: z.string(),
-        message: z.string(),
+        message: z.string().min(1),
       })
     )
     .query(async ({ ctx, input }) => {

@@ -24,6 +24,10 @@ const Messages = () => {
 const Home = () => {
   const { data: session, status } = useSession()
   const [message, setMessage] = useState("");
+  const postMessage = trpc.guestbook.postMessage.useQuery({
+    name: session?.user?.name as string,
+    message: message,
+  });
 
   if (status === 'loading') {
     return <main className='flex flex-col items-center pt-4'>Loading...</main>
@@ -48,11 +52,7 @@ const Home = () => {
                 onSubmit={(event) => {
                   event.preventDefault();
 
-                  trpc.guestbook.postMessage.useQuery({
-                    name: session.user?.name as string,
-                    message,
-                  });
-
+                  postMessage;
                   setMessage('');
                 }}>
                 <input
