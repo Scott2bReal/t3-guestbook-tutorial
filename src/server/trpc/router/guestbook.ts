@@ -24,7 +24,7 @@ export const guestbookRouter = t.router({
         message: z.string().min(1),
       })
     )
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.guestbook.create({
           data: {

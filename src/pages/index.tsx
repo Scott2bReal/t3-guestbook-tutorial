@@ -24,9 +24,20 @@ const Messages = () => {
 const Home = () => {
   const { data: session, status } = useSession()
   const [message, setMessage] = useState("");
-  const postMessage = trpc.guestbook.postMessage.useQuery({
-    name: session?.user?.name as string,
-    message: message,
+  const ctx = trpc.useContext();
+  const postMessage = trpc.guestbook.postMessage.useMutation({
+    onMutate: () => {
+      ctx.guestbook.findMany.cancel();
+
+      const optimisticUpdate = ctx.guestbook.findMany.getData();
+
+      if (optimisticUpdate) {
+        ctx.guestbook.findMany.setData(ctx.guestbook.findMany.getData());
+      }
+    },
+    onSettled: () => {
+      ctx.guestbook.findMany.invalidate;
+    },
   });
 
   if (status === 'loading') {
@@ -52,7 +63,11 @@ const Home = () => {
                 onSubmit={(event) => {
                   event.preventDefault();
 
-                  postMessage;
+                  postMessage.mutate({
+                    name: session.user?.name as string,
+                    message: message,
+                  })
+
                   setMessage('');
                 }}>
                 <input
