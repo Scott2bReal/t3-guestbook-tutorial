@@ -57,9 +57,6 @@ const Home = () => {
       <div className='pt-10'>
         {session ? (
           <div>
-            <p>hi {session.user?.name}</p>
-
-            <button onClick={() => signOut()}>Logout</button>
             <div>
               <form
                 className='flex gap-2'
@@ -88,6 +85,14 @@ const Home = () => {
                   Submit
                 </button>
               </form>
+              <p className='p-2'>hi {session.user?.name}</p>
+
+              <button
+                onClick={() => signOut()}
+                className='p-2 rounded-md border-2 border-zinc-800 bg-neutral-900 focus:outline-none'
+              >
+                Logout
+              </button>
             </div>
             <div className='pt-10'>
               <Messages />
@@ -95,7 +100,10 @@ const Home = () => {
           </div>
         ) : (
           <div>
-            <button onClick={() => signIn('discord')}>
+            <button
+              className='p-2 rounded-md border-2 border-zinc-800 bg-neutral-900 focus:outline-none'
+              onClick={() => signIn('discord')}
+            >
               Login with Discord
             </button>
 
