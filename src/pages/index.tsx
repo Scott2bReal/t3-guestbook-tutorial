@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { trpc } from '../utils/trpc'
 
 const Messages = () => {
-  const { data: messages, isLoading } = trpc.guestbook.findMany.useQuery();
+  const { data: messages, isLoading } = trpc.guestbook.getAll.useQuery();
 
   if (isLoading) return <div>Fetching messages...</div>
 
@@ -25,18 +25,21 @@ const Home = () => {
   const { data: session, status } = useSession()
   const [message, setMessage] = useState("");
   const ctx = trpc.useContext();
-  const postMessage = trpc.guestbook.postMessage.useMutation({
-    onMutate: () => {
-      ctx.guestbook.findMany.cancel();
 
-      const optimisticUpdate = ctx.guestbook.findMany.getData();
+  const postMessage = trpc.guestbook.postMessage.useMutation({
+    onMutate: async (input) => {
+      await ctx.guestbook.getAll.cancel();
+
+      const optimisticUpdate = ctx.guestbook.getAll.getData();
 
       if (optimisticUpdate) {
-        ctx.guestbook.findMany.setData(ctx.guestbook.findMany.getData());
+        ctx.guestbook.getAll.setData([...optimisticUpdate, input]);
       }
+
+      return { optimisticUpdate }
     },
     onSettled: () => {
-      ctx.guestbook.findMany.invalidate;
+      ctx.guestbook.getAll.invalidate();
     },
   });
 

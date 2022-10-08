@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { authedProcedure, t } from '../trpc'
 
 export const guestbookRouter = t.router({
-  findMany: t.procedure.query(async ({ ctx }) => {
+  getAll: t.procedure.query(async ({ ctx }) => {
     try {
       return await ctx.prisma.guestbook.findMany({
         select: {
