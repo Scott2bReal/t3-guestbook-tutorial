@@ -46,14 +46,14 @@ const Messages = () => {
         return (
           <div key={index}>
             <p>{msg.message}</p>
-            <span>- {msg.name}</span>
+            <span>- {msg.authorName}</span>
             <form
               onSubmit={(event) => {
                 event.preventDefault()
 
                 deleteMessage.mutate({
                   id: msg.id,
-                  name: msg.name,
+                  authorId: msg.authorId,
                 })
               }}
             >

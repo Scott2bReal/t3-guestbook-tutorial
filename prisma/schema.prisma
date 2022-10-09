@@ -54,6 +54,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   messages      Guestbook[] @relation("Messages")
+
+  @@unique([id, name])
 }
 
 model VerificationToken {
@@ -65,9 +67,10 @@ model VerificationToken {
 }
 
 model Guestbook {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  message   String   @db.VarChar(100)
-  author    User     @relation("Messages", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  message    String   @db.VarChar(100)
+  author     User     @relation("Messages", fields: [authorId, authorName], references: [id, name], onDelete: Cascade)
+  authorId   String
+  authorName String
 }

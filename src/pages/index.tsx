@@ -46,8 +46,9 @@ const Home = () => {
                   event.preventDefault()
 
                   postMessage.mutate({
-                    name: session.user?.name as string,
                     message: message,
+                    authorId: session.user?.id as string,
+                    authorName: session.user?.name as string,
                   })
 
                   setMessage('')

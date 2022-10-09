@@ -8,8 +8,9 @@ export const guestbookRouter = t.router({
       return await ctx.prisma.guestbook.findMany({
         select: {
           id: true,
-          name: true,
           message: true,
+          authorId: true,
+          authorName: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -23,16 +24,18 @@ export const guestbookRouter = t.router({
   postMessage: authedProcedure
     .input(
       z.object({
-        name: z.string(),
         message: z.string().min(1),
+        authorId: z.string().cuid(),
+        authorName: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.guestbook.create({
           data: {
-            name: input.name,
             message: input.message,
+            authorId: ctx.session.user?.id as string,
+            authorName: ctx.session.user?.name as string,
           },
         })
       } catch (error) {
@@ -44,11 +47,11 @@ export const guestbookRouter = t.router({
     .input(
       z.object({
         id: z.string().cuid(),
-        name: z.string(),
+        authorId: z.string().cuid(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (ctx.session.user.name !== input.name) {
+      if (ctx.session.user?.id !== input.authorId) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: "It doesn't seem like you made this post..."
@@ -63,21 +66,21 @@ export const guestbookRouter = t.router({
       }
     }),
 
-  editMessage: authedProcedure
-    .input(
-      z.object({
-        id: z.string().cuid(),
-        message: z.string().min(1),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await ctx.prisma.guestbook.update({
-          where: { id: input.id },
-          data: { message: input.message },
-        })
-      } catch (error) {
-        console.log(error)
-      }
-    }),
+  // editMessage: authedProcedure
+  //   .input(
+  //     z.object({
+  //       id: z.string().cuid(),
+  //       message: z.string().min(1),
+  //     })
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     try {
+  //       await ctx.prisma.guestbook.update({
+  //         where: { id: input.id },
+  //         data: { message: input.message },
+  //       })
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }),
 })
