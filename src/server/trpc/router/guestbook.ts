@@ -6,6 +6,7 @@ export const guestbookRouter = t.router({
     try {
       return await ctx.prisma.guestbook.findMany({
         select: {
+          id: true,
           name: true,
           message: true,
         },
@@ -31,6 +32,21 @@ export const guestbookRouter = t.router({
             name: input.name,
             message: input.message,
           },
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }),
+  deleteMessage: authedProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.prisma.guestbook.delete({
+          where: { id: input.id },
         })
       } catch (error) {
         console.log(error)
