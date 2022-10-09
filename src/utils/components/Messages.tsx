@@ -1,38 +1,30 @@
 import { trpc } from '../trpc'
 
+
 const Messages = () => {
   const { data: messages, isLoading } = trpc.guestbook.getAll.useQuery()
   const ctx = trpc.useContext()
+  const optimisticGuestbookUpdater = async () => {
+    await ctx.guestbook.getAll.cancel()
+
+    const optimisticUpdate = ctx.guestbook.getAll.getData()
+
+    if (optimisticUpdate) {
+      ctx.guestbook.getAll.setData(optimisticUpdate)
+    }
+
+    return { optimisticUpdate }
+  }
 
   const deleteMessage = trpc.guestbook.deleteMessage.useMutation({
-    onMutate: async () => {
-      await ctx.guestbook.getAll.cancel()
-
-      const optimisticUpdate = ctx.guestbook.getAll.getData()
-
-      if (optimisticUpdate) {
-        ctx.guestbook.getAll.setData(optimisticUpdate)
-      }
-
-      return { optimisticUpdate }
-    },
+    onMutate: optimisticGuestbookUpdater,
     onSettled: () => {
       ctx.guestbook.getAll.invalidate()
     },
   })
 
   // const editMessage = trpc.guestbook.editMessage.useMutation({
-  //   onMutate: async () => {
-  //     await ctx.guestbook.getAll.cancel()
-  //
-  //     const optimisticUpdate = ctx.guestbook.getAll.getData()
-  //
-  //     if (optimisticUpdate) {
-  //       ctx.guestbook.getAll.setData(optimisticUpdate)
-  //     }
-  //
-  //     return { optimisticUpdate }
-  //   },
+  //   onMutate: optimisticGuestbookUpdater,
   //   onSettled: () => {
   //     ctx.guestbook.getAll.invalidate()
   //   },
