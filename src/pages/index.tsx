@@ -9,8 +9,8 @@ const Home = () => {
   const ctx = trpc.useContext()
 
   const postMessage = trpc.guestbook.postMessage.useMutation({
-    onMutate: () => {
-      ctx.guestbook.getAll.cancel()
+    onMutate: async () => {
+      await ctx.guestbook.getAll.cancel()
 
       const optimisticUpdate = ctx.guestbook.getAll.getData()
 

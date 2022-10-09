@@ -1,11 +1,12 @@
-import { trpc } from "../trpc";
+import { trpc } from '../trpc'
 
 const Messages = () => {
   const { data: messages, isLoading } = trpc.guestbook.getAll.useQuery()
-  const ctx = trpc.useContext();
+  const ctx = trpc.useContext()
+
   const deleteMessage = trpc.guestbook.deleteMessage.useMutation({
-    onMutate: () => {
-      ctx.guestbook.getAll.cancel()
+    onMutate: async () => {
+      await ctx.guestbook.getAll.cancel()
 
       const optimisticUpdate = ctx.guestbook.getAll.getData()
 
@@ -19,6 +20,23 @@ const Messages = () => {
       ctx.guestbook.getAll.invalidate()
     },
   })
+
+  // const editMessage = trpc.guestbook.editMessage.useMutation({
+  //   onMutate: async () => {
+  //     await ctx.guestbook.getAll.cancel()
+  //
+  //     const optimisticUpdate = ctx.guestbook.getAll.getData()
+  //
+  //     if (optimisticUpdate) {
+  //       ctx.guestbook.getAll.setData(optimisticUpdate)
+  //     }
+  //
+  //     return { optimisticUpdate }
+  //   },
+  //   onSettled: () => {
+  //     ctx.guestbook.getAll.invalidate()
+  //   },
+  // })
 
   if (isLoading) return <div>Fetching messages...</div>
 
@@ -49,4 +67,4 @@ const Messages = () => {
   )
 }
 
-export default Messages;
+export default Messages

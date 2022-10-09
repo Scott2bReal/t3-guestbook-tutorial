@@ -18,6 +18,7 @@ export const guestbookRouter = t.router({
       console.log('error', error)
     }
   }),
+
   postMessage: authedProcedure
     .input(
       z.object({
@@ -37,6 +38,7 @@ export const guestbookRouter = t.router({
         console.log(error)
       }
     }),
+
   deleteMessage: authedProcedure
     .input(
       z.object({
@@ -47,6 +49,24 @@ export const guestbookRouter = t.router({
       try {
         await ctx.prisma.guestbook.delete({
           where: { id: input.id },
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }),
+
+  editMessage: authedProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        message: z.string().min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.prisma.guestbook.update({
+          where: { id: input.id },
+          data: { message: input.message },
         })
       } catch (error) {
         console.log(error)
