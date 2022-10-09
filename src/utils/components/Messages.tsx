@@ -53,6 +53,7 @@ const Messages = () => {
 
                 deleteMessage.mutate({
                   id: msg.id,
+                  name: msg.name,
                 })
               }}
             >

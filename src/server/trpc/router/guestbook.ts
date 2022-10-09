@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { authedProcedure, t } from '../trpc'
 
@@ -43,9 +44,16 @@ export const guestbookRouter = t.router({
     .input(
       z.object({
         id: z.string().cuid(),
+        name: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.name !== input.name) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: "It doesn't seem like you made this post..."
+        })
+      }
       try {
         await ctx.prisma.guestbook.delete({
           where: { id: input.id },
